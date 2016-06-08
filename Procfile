@@ -1,0 +1,1 @@
+web: gunicorn gitlet_hub.wsgi
