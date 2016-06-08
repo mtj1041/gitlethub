@@ -8,7 +8,7 @@ from django.http import HttpResponseRedirect
 # Create your views here.
 
 def index(request):
-    return HttpResponse("Hello!")
+    return render(request, 'hub/index.html', {"userid":30})
 
 def panel(request, userid):
     return render(request, 'hub/index.html', {"userid":userid})
