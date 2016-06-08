@@ -29,6 +29,15 @@ def register(request):
     })
 
 def login(request):
+    if request.get_full_path().split("/")[-1] != "": # handling remote connections
+        params = request.get_full_path().split("/")[-1].split("&")
+        username = params[0]
+        password = params[1]
+        user = auth.authenticate(username=username, password=password)
+        if user is not None and user.is_active:
+            return HttpResponse("Remote credentials correct")
+        else:
+            return HttpResponse("Remote credentials incorrect")
     if request.method == 'POST':
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
