@@ -4,6 +4,9 @@ from django.http import HttpResponse
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
+from django.contrib import auth
+
+import forms
 
 # Create your views here.
 
@@ -18,9 +21,45 @@ def register(request):
         form = UserCreationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            return HttpResponseRedirect("/hub/")
+            return HttpResponseRedirect("/")
     else:
         form = UserCreationForm()
     return render(request, "hub/register.html", {
         'form': form,
     })
+
+def login(request):
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        print("USERNAME: " + username)
+        print("PASSWORD: " + password)
+        user = auth.authenticate(username=username, password=password)
+        if user is not None and user.is_active:
+        # Correct password, and the user is marked "active"
+            auth.login(request, user)
+        # Redirect to a success page.
+            return HttpResponseRedirect("/success")
+            
+            #return render(request, 'hub/account/success.html')
+            
+        else:
+            # Show an error page
+            return HttpResponseRedirect("/failure")
+    else:
+        form = forms.LoginForm()
+        return render(request, "hub/login.html", {"form":form})
+
+def logout(request):
+    if request.user:
+        auth.logout(request)
+        return HttpResponse("You have successfully logged out.")
+    else:
+        return HttpResponse("You are not logged in! Please login first.")
+
+def success(request):
+    return render(request, 'hub/account/success.html', {"user":request.user})
+
+def failure(request):
+    return render(request, 'hub/account/failure.html')
+    
