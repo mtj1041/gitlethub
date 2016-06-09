@@ -9,5 +9,6 @@ urlpatterns = [
     url(r'login/', views.login, name='login'),
     url(r'logout/', views.logout, name='logout'),
     url(r'success/', views.success, name='success'),
-    url(r'failure/', views.failure, name='failure')
+    url(r'failure/', views.failure, name='failure'),
+    url(r'upload/', views.upload_file, name='upload')
 ]

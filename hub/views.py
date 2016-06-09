@@ -6,6 +6,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.http import HttpResponseRedirect
 from django.contrib import auth
 
+from django.shortcuts import render
+from .forms import UploadFileForm
+
 import forms
 
 # Create your views here.
@@ -15,6 +18,18 @@ def index(request):
 
 def panel(request, userid):
     return render(request, 'hub/index.html', {"userid":userid})
+
+def upload_file(request):
+    if request.user.is_active:
+        if request.method == 'POST':
+            form = UploadFileForm(request.POST, request.FILES)
+            if form.is_valid():
+                return HttpResponseRedirect('/success')
+        else:
+            form = UploadFileForm()
+        return render(request, 'hub/upload.html', {'form': form})
+    else:
+        return HttpResponse("You must be logged in to do this!")
 
 def register(request):
     if request.method == 'POST':
@@ -29,12 +44,14 @@ def register(request):
     })
 
 def login(request):
-    if request.get_full_path().split("/")[-1] != "": # handling remote connections
+    if request.get_full_path().split("/")[-1] != "" and request.get_full_path().split("/")[-1] != "login": # handling remote connections
+        
         params = request.get_full_path().split("/")[-1].split("&")
         username = params[0]
         password = params[1]
         user = auth.authenticate(username=username, password=password)
         if user is not None and user.is_active:
+            auth.login(request, user)
             return HttpResponse("Remote credentials correct")
         else:
             return HttpResponse("Remote credentials incorrect")
@@ -49,9 +66,7 @@ def login(request):
             auth.login(request, user)
         # Redirect to a success page.
             return HttpResponseRedirect("/success")
-            
             #return render(request, 'hub/account/success.html')
-            
         else:
             # Show an error page
             return HttpResponseRedirect("/failure")
