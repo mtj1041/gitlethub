@@ -12,12 +12,14 @@ from .forms import UploadFileForm
 from .models import File
 
 import forms
+import os
 import models
 # Create your views here.
 
 def index(request):
     if request.user.is_authenticated:
         files = File.objects.filter(user_belongs=request.user.get_username())
+
     return render(request, 'hub/index.html', {"files":files})
 
 def panel(request, userid):
@@ -35,7 +37,7 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['docfile']
-            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id=commit_id)
+            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id='1')
             model_file.save()
             return HttpResponseRedirect('/success')
     else:
@@ -97,4 +99,3 @@ def success(request):
 
 def failure(request):
     return render(request, 'hub/account/failure.html')
-    

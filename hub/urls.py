@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'logout/', views.logout, name='logout'),
     url(r'success/', views.success, name='success'),
     url(r'failure/', views.failure, name='failure'),
-    url(r'upload/',  csrf_exempt(views.upload_file), name='upload') #need csrf exempt to prevent HTTP 302
+    url(r'upload/',  csrf_exempt(views.upload_file), name='upload'), #need csrf exempt to prevent HTTP 302
+   # url(r'uploads/', views.render_file, name='show_file')
 ]

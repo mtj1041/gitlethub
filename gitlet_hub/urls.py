@@ -18,7 +18,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.views import login, logout
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     url('', include('hub.urls')),
-    url(r'^admin/', admin.site.urls),
-]
+    url(r'^admin/', admin.site.urls)
+] + static('/uploads/', document_root=settings.MEDIA_ROOT)

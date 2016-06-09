@@ -7,7 +7,7 @@ from django.db import models
 def upload_path_handler(instance, filename):
     print("INSTANCE: " + instance.user_belongs)
     print("FILENAME: " + filename)
-    return "uploads/{id}/{commit_id}/{file}".format(id=instance.user_belongs, commit_id=instance.commit_id, file=filename)
+    return "{id}/{commit_id}/{file}".format(id=instance.user_belongs, commit_id=instance.commit_id, file=filename)
     
 class File(models.Model):
     name = models.CharField(max_length=30)
