@@ -9,27 +9,37 @@ from django.contrib import auth
 from django.shortcuts import render
 from .forms import UploadFileForm
 
-import forms
+from .models import File
 
+import forms
+import models
 # Create your views here.
 
 def index(request):
-    return render(request, 'hub/index.html', {"userid":30})
+    if request.user.is_authenticated:
+        files = File.objects.filter(user_belongs=request.user.get_username())
+    return render(request, 'hub/index.html', {"files":files})
 
 def panel(request, userid):
     return render(request, 'hub/index.html', {"userid":userid})
 
 def upload_file(request):
-    if request.user.is_active:
-        if request.method == 'POST':
-            form = UploadFileForm(request.POST, request.FILES)
-            if form.is_valid():
-                return HttpResponseRedirect('/success')
-        else:
-            form = UploadFileForm()
-        return render(request, 'hub/upload.html', {'form': form})
+    if '&' in request.get_full_path().split("/")[-1]: # remote user interaction
+        params = request.get_full_path().split("/")[-1].split("&")
+        username = params[0]
+        password = params[1]
+        user = auth.authenticate(username=username, password=password)
+        auth.login(request, user)
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['docfile']
+            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username())
+            model_file.save()
+            return HttpResponseRedirect('/success')
     else:
-        return HttpResponse("You must be logged in to do this!")
+        form = UploadFileForm()
+    return render(request, 'hub/upload.html', {'form': form})
 
 def register(request):
     if request.method == 'POST':
@@ -45,7 +55,6 @@ def register(request):
 
 def login(request):
     if request.get_full_path().split("/")[-1] != "" and request.get_full_path().split("/")[-1] != "login": # handling remote connections
-        
         params = request.get_full_path().split("/")[-1].split("&")
         username = params[0]
         password = params[1]
