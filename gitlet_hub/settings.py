@@ -24,7 +24,7 @@ MEDIA_ROOT = os.path.join(CURRENT_DIR, 'uploads')
 SECRET_KEY = 'z#$60hj5%uodls42v7rj0h04ipr=zc_#ky0034&b+(cl93!i69'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
