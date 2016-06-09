@@ -23,18 +23,20 @@ def index(request):
 def panel(request, userid):
     return render(request, 'hub/index.html', {"userid":userid})
 
+@csrf_exempt
 def upload_file(request):
     if '&' in request.get_full_path().split("/")[-1]: # remote user interaction
         params = request.get_full_path().split("/")[-1].split("&")
         username = params[0]
         password = params[1]
+        commit_id = params[2]
         user = auth.authenticate(username=username, password=password)
         auth.login(request, user)
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['docfile']
-            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username())
+            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id=commit_id)
             model_file.save()
             return HttpResponseRedirect('/success')
     else:
@@ -53,6 +55,7 @@ def register(request):
         'form': form,
     })
 
+@csrf_exempt
 def login(request):
     if request.get_full_path().split("/")[-1] != "" and request.get_full_path().split("/")[-1] != "login": # handling remote connections
         params = request.get_full_path().split("/")[-1].split("&")
