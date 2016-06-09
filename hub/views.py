@@ -35,7 +35,7 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['docfile']
-            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id = '1')
+            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id=commit_id)
             model_file.save()
             return HttpResponseRedirect('/success')
     else:
