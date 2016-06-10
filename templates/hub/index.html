@@ -3,8 +3,8 @@
   
   {% if files %}
             <ul>
-                {% for document in files %}
-                    <li><a href="uploads/{{ document.file.url }}">{{ document.file.name }}</a></li>
+                {% for document in keys %}
+                    <li><a href="{% url 'register' %}">{{ document }}</a></li>
                 {% endfor %}
             </ul>
     {% else %}

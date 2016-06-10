@@ -18,9 +18,18 @@ import models
 
 def index(request):
     if request.user.is_authenticated:
-        files = File.objects.filter(user_belongs=request.user.get_username())
-
-    return render(request, 'hub/index.html', {"files":files})
+        files = File.objects.filter(user_belongs=request.user.get_username(), commit_id='1')
+    
+    commit_dict = {}
+    for i in files:
+        print(i.commit_id)
+        if i.commit_id in commit_dict.keys():
+            commit_dict[i.commit_id].append(i)
+        else:
+            commit_dict[i.commit_id] = [i]
+            
+    #files.filter(commit_id='2')
+    return render(request, 'hub/index.html', {"files":files, "keys":commit_dict.keys()})
 
 def panel(request, userid):
     return render(request, 'hub/index.html', {"userid":userid})
@@ -37,7 +46,7 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['docfile']
-            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id='1')
+            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id='2')
             model_file.save()
             return HttpResponseRedirect('/success')
     else:
@@ -99,3 +108,8 @@ def success(request):
 
 def failure(request):
     return render(request, 'hub/account/failure.html')
+
+def repo(request, user):
+    logged_user = request.user.username
+    
+    return HttpResponse("User: " + user + " Logged in user: " + logged_user)
