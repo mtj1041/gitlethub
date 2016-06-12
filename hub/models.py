@@ -13,4 +13,5 @@ class File(models.Model):
     name = models.CharField(max_length=30)
     user_belongs = models.CharField(max_length=30)
     commit_id = models.CharField(max_length=30)
+    repo = models.CharField(max_length=100, default="matts repo")
     file = models.FileField(upload_to=upload_path_handler)

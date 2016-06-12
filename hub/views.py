@@ -18,18 +18,22 @@ import models
 
 def index(request):
     if request.user.is_authenticated:
-        files = File.objects.filter(user_belongs=request.user.get_username(), commit_id='1')
-    
+        files = File.objects.filter(user_belongs=request.user.get_username())
     commit_dict = {}
+    repo_dict = {}
+    
+
     for i in files:
-        print(i.commit_id)
-        if i.commit_id in commit_dict.keys():
-            commit_dict[i.commit_id].append(i)
-        else:
-            commit_dict[i.commit_id] = [i]
-            
+        repo_dict[i.repo] = {}
+    
+    for i in repo_dict.keys(): # STRUCTURE: repo_dict["matts great repo"][2] -> all files in commit 2 of matt's great repo
+        repo_files = File.objects.filter(user_belongs=request.user.get_username(), repo=i)
+        for x in repo_files:
+            if x.commit_id not in repo_dict[i].keys():
+                repo_dict[i][x.commit_id] = File.objects.filter(user_belongs=request.user.get_username(), repo=i, commit_id=x)
+        
     #files.filter(commit_id='2')
-    return render(request, 'hub/index.html', {"files":files, "keys":commit_dict.keys()})
+    return render(request, 'hub/index.html', {"files":files, "keys":repo_dict.keys()})
 
 def panel(request, userid):
     return render(request, 'hub/index.html', {"userid":userid})
@@ -40,13 +44,15 @@ def upload_file(request):
         username = params[0]
         password = params[1]
         commit_id = params[2]
+        repo = params[3].replace("%20", " ")
+        print("Repo name: " + repo)
         user = auth.authenticate(username=username, password=password)
         auth.login(request, user)
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['docfile']
-            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id='2')
+            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id=commit_id, repo=repo)
             model_file.save()
             return HttpResponseRedirect('/success')
     else:
