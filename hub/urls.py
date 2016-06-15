@@ -12,6 +12,7 @@ urlpatterns = [
     url(r'success/', views.success, name='success'),
     url(r'failure/', views.failure, name='failure'),
     url(r'upload/',  csrf_exempt(views.upload_file), name='upload'), #need csrf exempt to prevent HTTP 302
-    url(r'repos/([a-zA-Z0-9]+)/$', views.repo, name='repo')
+    url(r'([a-zA-Z0-9]+)/repos/(.+)/$', views.repo, name='repo'),
+    url(r'([a-zA-Z0-9]+)/repos/(.+)/(.+)$', views.repoFiles, name='repoCommit')
    # url(r'uploads/', views.render_file, name='show_file')
 ]

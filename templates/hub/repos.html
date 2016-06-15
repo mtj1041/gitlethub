@@ -1,0 +1,11 @@
+<p>Welcome, {{ username }}!</p>
+  
+  {% if commit_ids %}
+            <ul>
+                {% for commit in commit_ids %}
+                    <li><a href="{{ commit }}">{{ commit }}</a></li>
+                {% endfor %}
+            </ul>
+    {% else %}
+            <p>No documents.</p>
+    {% endif %}

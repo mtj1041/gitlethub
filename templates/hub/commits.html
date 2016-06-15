@@ -1,0 +1,11 @@
+<p>Welcome, {{ user.username }}!</p>
+  
+  {% if files %}
+            <ul>
+                {% for file in files %}
+                    <li><a href="/uploads/{{ file.file.url }}">{{ file.name }}</a></li>
+                {% endfor %}
+            </ul>
+    {% else %}
+            <p>No documents.</p>
+    {% endif %}

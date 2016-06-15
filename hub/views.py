@@ -16,22 +16,25 @@ import os
 import models
 # Create your views here.
 
-def index(request):
-    if request.user.is_authenticated:
-        files = File.objects.filter(user_belongs=request.user.get_username())
+def createRepoDict(user):
     commit_dict = {}
     repo_dict = {}
-    
-
+    files = File.objects.filter(user_belongs=user)
     for i in files:
         repo_dict[i.repo] = {}
     
     for i in repo_dict.keys(): # STRUCTURE: repo_dict["matts great repo"][2] -> all files in commit 2 of matt's great repo
-        repo_files = File.objects.filter(user_belongs=request.user.get_username(), repo=i)
+        repo_files = File.objects.filter(user_belongs=user, repo=i)
         for x in repo_files:
             if x.commit_id not in repo_dict[i].keys():
-                repo_dict[i][x.commit_id] = File.objects.filter(user_belongs=request.user.get_username(), repo=i, commit_id=x)
-        
+                repo_dict[i][x.commit_id] = File.objects.filter(user_belongs=user, repo=i, commit_id=x)
+    
+    return repo_dict
+                
+def index(request):
+    if request.user.is_authenticated:
+        files = File.objects.filter(user_belongs=request.user.get_username())
+    repo_dict = createRepoDict(request.user.get_username())
     #files.filter(commit_id='2')
     return render(request, 'hub/index.html', {"files":files, "keys":repo_dict.keys()})
 
@@ -52,7 +55,7 @@ def upload_file(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             file = request.FILES['docfile']
-            model_file = File(file=file, name='regfile', user_belongs=request.user.get_username(), commit_id=commit_id, repo=repo)
+            model_file = File(file=file, name=file.name, user_belongs=request.user.get_username(), commit_id='1', repo='matt is smart')
             model_file.save()
             return HttpResponseRedirect('/success')
     else:
@@ -115,7 +118,17 @@ def success(request):
 def failure(request):
     return render(request, 'hub/account/failure.html')
 
-def repo(request, user):
+def repo(request, user, repo):
     logged_user = request.user.username
+    repo = repo.replace("%20", " ")
+    files = File.objects.filter(user_belongs=user, repo=repo)
+    repo_dict = createRepoDict(user)[repo]
     
-    return HttpResponse("User: " + user + " Logged in user: " + logged_user)
+    return render(request, 'hub/repos.html', {"commit_ids":repo_dict.keys(), "repo":repo, "username":user})
+
+def repoFiles(request, user, repo, commit):
+    logged_user = request.user.username
+    repo = repo.replace("%20", " ")
+    files = File.objects.filter(user_belongs=user, repo=repo, commit_id=commit)
+
+    return render(request, 'hub/commits.html', {"files":files, "commit_id":commit, "user":user})
